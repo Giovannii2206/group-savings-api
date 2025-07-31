@@ -18,6 +18,7 @@ namespace GroupSavingsApi.Models
         public string Status { get; set; } = "Active";
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsDeleted { get; set; } = false;
 
         // Navigation properties
         public ICollection<GroupSession> Sessions { get; set; } = new List<GroupSession>();

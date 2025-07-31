@@ -20,24 +20,26 @@ namespace GroupSavingsApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GroupSessionResponseDto>>> GetGroupSessions()
         {
-            var sessions = await _context.GroupSessions.Select(s => new GroupSessionResponseDto
-            {
-                Id = s.Id,
-                GroupId = s.GroupId,
-                TargetAmount = s.TargetAmount,
-                TargetDate = s.TargetDate,
-                StartDate = s.StartDate,
-                Frequency = s.Frequency,
-                Status = s.Status,
-                TotalContributed = s.TotalContributed
-            }).ToListAsync();
+            var sessions = await _context.GroupSessions
+                .Where(s => !s.IsDeleted)
+                .Select(s => new GroupSessionResponseDto
+                {
+                    Id = s.Id,
+                    GroupId = s.GroupId,
+                    TargetAmount = s.TargetAmount,
+                    TargetDate = s.TargetDate,
+                    StartDate = s.StartDate,
+                    Frequency = s.Frequency,
+                    Status = s.Status,
+                    TotalContributed = s.TotalContributed
+                }).ToListAsync();
             return Ok(sessions);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<GroupSessionResponseDto>> GetGroupSession(Guid id)
         {
-            var s = await _context.GroupSessions.FindAsync(id);
+            var s = await _context.GroupSessions.FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted);
             if (s == null) return NotFound();
             return Ok(new GroupSessionResponseDto
             {
@@ -84,14 +86,14 @@ namespace GroupSavingsApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateGroupSession(Guid id, UpdateGroupSessionDto dto)
         {
-            var session = await _context.GroupSessions.FindAsync(id);
+            var session = await _context.GroupSessions.FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted);
             if (session == null) return NotFound();
-            if (dto.TargetAmount.HasValue) session.TargetAmount = dto.TargetAmount.Value;
-            if (dto.TargetDate.HasValue) session.TargetDate = dto.TargetDate.Value;
-            if (dto.StartDate.HasValue) session.StartDate = dto.StartDate.Value;
+            if (dto.TargetAmount != null) session.TargetAmount = dto.TargetAmount.Value;
+            if (dto.TargetDate != null) session.TargetDate = dto.TargetDate.Value;
+            if (dto.StartDate != null) session.StartDate = dto.StartDate.Value;
             if (dto.Frequency != null) session.Frequency = dto.Frequency;
             if (dto.Status != null) session.Status = dto.Status;
-            if (dto.TotalContributed.HasValue) session.TotalContributed = dto.TotalContributed.Value;
+            if (dto.TotalContributed != null) session.TotalContributed = dto.TotalContributed.Value;
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -99,9 +101,9 @@ namespace GroupSavingsApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGroupSession(Guid id)
         {
-            var session = await _context.GroupSessions.FindAsync(id);
+            var session = await _context.GroupSessions.FirstOrDefaultAsync(s => s.Id == id && !s.IsDeleted);
             if (session == null) return NotFound();
-            _context.GroupSessions.Remove(session);
+            session.IsDeleted = true;
             await _context.SaveChangesAsync();
             return NoContent();
         }

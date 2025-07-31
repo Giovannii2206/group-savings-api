@@ -18,23 +18,29 @@ namespace GroupSavingsApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GroupResponseDto>>> GetGroups()
+        public async Task<ActionResult<IEnumerable<GroupResponseDto>>> GetGroups([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? name = null)
         {
-            var groups = await _context.Groups.Select(g => new GroupResponseDto
-            {
-                Id = g.Id,
-                Name = g.Name,
-                CreatedBy = g.CreatedBy,
-                Status = g.Status,
-                CreatedAt = g.CreatedAt
-            }).ToListAsync();
+            var query = _context.Groups.Where(g => !g.IsDeleted);
+            if (!string.IsNullOrEmpty(name)) query = query.Where(g => g.Name.Contains(name));
+            var groups = await query
+                .OrderByDescending(g => g.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(g => new GroupResponseDto
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    CreatedBy = g.CreatedBy,
+                    Status = g.Status,
+                    CreatedAt = g.CreatedAt
+                }).ToListAsync();
             return Ok(groups);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<GroupResponseDto>> GetGroup(Guid id)
         {
-            var g = await _context.Groups.FindAsync(id);
+            var g = await _context.Groups.FirstOrDefaultAsync(g => g.Id == id && !g.IsDeleted);
             if (g == null) return NotFound();
             return Ok(new GroupResponseDto
             {
@@ -72,7 +78,7 @@ namespace GroupSavingsApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateGroup(Guid id, UpdateGroupDto dto)
         {
-            var group = await _context.Groups.FindAsync(id);
+            var group = await _context.Groups.FirstOrDefaultAsync(g => g.Id == id && !g.IsDeleted);
             if (group == null) return NotFound();
             if (dto.Name != null) group.Name = dto.Name;
             if (dto.Status != null) group.Status = dto.Status;
@@ -83,9 +89,9 @@ namespace GroupSavingsApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGroup(Guid id)
         {
-            var group = await _context.Groups.FindAsync(id);
+            var group = await _context.Groups.FirstOrDefaultAsync(g => g.Id == id && !g.IsDeleted);
             if (group == null) return NotFound();
-            _context.Groups.Remove(group);
+            group.IsDeleted = true;
             await _context.SaveChangesAsync();
             return NoContent();
         }

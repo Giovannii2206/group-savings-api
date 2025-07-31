@@ -20,22 +20,24 @@ namespace GroupSavingsApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ContributionResponseDto>>> GetContributions()
         {
-            var contributions = await _context.Contributions.Select(c => new ContributionResponseDto
-            {
-                Id = c.Id,
-                GroupSessionId = c.GroupSessionId,
-                UserId = c.UserId,
-                Amount = c.Amount,
-                Date = c.Date,
-                Type = c.Type
-            }).ToListAsync();
+            var contributions = await _context.Contributions
+                .Where(c => !c.IsDeleted)
+                .Select(c => new ContributionResponseDto
+                {
+                    Id = c.Id,
+                    GroupSessionId = c.GroupSessionId,
+                    UserId = c.UserId,
+                    Amount = c.Amount,
+                    Date = c.Date,
+                    Type = c.Type
+                }).ToListAsync();
             return Ok(contributions);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ContributionResponseDto>> GetContribution(Guid id)
         {
-            var c = await _context.Contributions.FindAsync(id);
+            var c = await _context.Contributions.FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
             if (c == null) return NotFound();
             return Ok(new ContributionResponseDto
             {
@@ -87,9 +89,9 @@ namespace GroupSavingsApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteContribution(Guid id)
         {
-            var contribution = await _context.Contributions.FindAsync(id);
+            var contribution = await _context.Contributions.FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
             if (contribution == null) return NotFound();
-            _context.Contributions.Remove(contribution);
+            contribution.IsDeleted = true;
             await _context.SaveChangesAsync();
             return NoContent();
         }

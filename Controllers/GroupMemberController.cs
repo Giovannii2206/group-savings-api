@@ -20,22 +20,24 @@ namespace GroupSavingsApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GroupMemberResponseDto>>> GetGroupMembers()
         {
-            var members = await _context.GroupMembers.Select(m => new GroupMemberResponseDto
-            {
-                Id = m.Id,
-                GroupId = m.GroupId,
-                UserId = m.UserId,
-                RoleId = m.RoleId,
-                JoinedAt = m.JoinedAt,
-                TotalContributed = m.TotalContributed
-            }).ToListAsync();
+            var members = await _context.GroupMembers
+                .Where(m => !m.IsDeleted)
+                .Select(m => new GroupMemberResponseDto
+                {
+                    Id = m.Id,
+                    GroupId = m.GroupId,
+                    UserId = m.UserId,
+                    RoleId = m.RoleId,
+                    JoinedAt = m.JoinedAt,
+                    TotalContributed = m.TotalContributed
+                }).ToListAsync();
             return Ok(members);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<GroupMemberResponseDto>> GetGroupMember(Guid id)
         {
-            var m = await _context.GroupMembers.FindAsync(id);
+            var m = await _context.GroupMembers.FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
             if (m == null) return NotFound();
             return Ok(new GroupMemberResponseDto
             {
@@ -87,9 +89,9 @@ namespace GroupSavingsApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGroupMember(Guid id)
         {
-            var member = await _context.GroupMembers.FindAsync(id);
+            var member = await _context.GroupMembers.FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
             if (member == null) return NotFound();
-            _context.GroupMembers.Remove(member);
+            member.IsDeleted = true;
             await _context.SaveChangesAsync();
             return NoContent();
         }

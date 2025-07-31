@@ -20,25 +20,27 @@ namespace GroupSavingsApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MemberResponseDto>>> GetMembers()
         {
-            var members = await _context.Members.Select(m => new MemberResponseDto
-            {
-                Id = m.Id,
-                UserId = m.UserId,
-                FirstName = m.FirstName,
-                LastName = m.LastName,
-                Phone = m.Phone,
-                Address = m.Address,
-                DateOfBirth = m.DateOfBirth,
-                Gender = m.Gender,
-                AccountBalance = m.AccountBalance
-            }).ToListAsync();
+            var members = await _context.Members
+                .Where(m => !m.IsDeleted)
+                .Select(m => new MemberResponseDto
+                {
+                    Id = m.Id,
+                    UserId = m.UserId,
+                    FirstName = m.FirstName,
+                    LastName = m.LastName,
+                    Phone = m.Phone,
+                    Address = m.Address,
+                    DateOfBirth = m.DateOfBirth,
+                    Gender = m.Gender,
+                    AccountBalance = m.AccountBalance
+                }).ToListAsync();
             return Ok(members);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<MemberResponseDto>> GetMember(Guid id)
         {
-            var m = await _context.Members.FindAsync(id);
+            var m = await _context.Members.FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
             if (m == null) return NotFound();
             return Ok(new MemberResponseDto
             {
@@ -103,9 +105,9 @@ namespace GroupSavingsApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMember(Guid id)
         {
-            var member = await _context.Members.FindAsync(id);
+            var member = await _context.Members.FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
             if (member == null) return NotFound();
-            _context.Members.Remove(member);
+            member.IsDeleted = true;
             await _context.SaveChangesAsync();
             return NoContent();
         }

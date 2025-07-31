@@ -22,9 +22,9 @@ namespace GroupSavingsApi.Models
         [Required]
         [MaxLength(20)]
         public string Type { get; set; } = string.Empty; // "manual" or "auto"
-
         // Navigation properties
         public GroupSession GroupSession { get; set; } = null!;
         public User User { get; set; } = null!;
+        public bool IsDeleted { get; set; } = false;
     }
 }

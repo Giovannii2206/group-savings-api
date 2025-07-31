@@ -29,6 +29,7 @@ namespace GroupSavingsApi.Models
         
         [Column(TypeName = "decimal(18,2)")]
         public decimal AccountBalance { get; set; } = 0;
+        public bool IsDeleted { get; set; } = false;
 
         // Navigation properties
         public User User { get; set; } = null!;

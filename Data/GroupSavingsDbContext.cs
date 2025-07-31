@@ -19,6 +19,9 @@ namespace GroupSavingsApi.Data
         public DbSet<GroupSession> GroupSessions { get; set; }
         public DbSet<Contribution> Contributions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<GroupInvitation> GroupInvitations { get; set; }
+        public DbSet<SavingsGoal> SavingsGoals { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
