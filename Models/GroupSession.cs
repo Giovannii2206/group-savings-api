@@ -34,5 +34,6 @@ namespace GroupSavingsApi.Models
         // Navigation properties
         public Group Group { get; set; } = null!;
         public ICollection<Contribution> Contributions { get; set; } = new List<Contribution>();
+        public ICollection<SavingsGoal> SavingsGoals { get; set; } = new List<SavingsGoal>();
     }
 }

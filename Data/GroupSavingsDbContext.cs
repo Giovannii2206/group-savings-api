@@ -21,6 +21,8 @@ namespace GroupSavingsApi.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<GroupInvitation> GroupInvitations { get; set; }
         public DbSet<SavingsGoal> SavingsGoals { get; set; }
+// SavingsGoal-GroupSession relation
+// modelBuilder.Entity<SavingsGoal>().HasOne(sg => sg.GroupSession).WithMany(gs => gs.SavingsGoals).HasForeignKey(sg => sg.GroupSessionId);
         public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

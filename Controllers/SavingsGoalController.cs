@@ -25,7 +25,7 @@ namespace GroupSavingsApi.Controllers
                 .Select(g => new SavingsGoalResponseDto
                 {
                     Id = g.Id,
-                    GroupId = g.GroupId,
+                    GroupSessionId = g.GroupSessionId,
                     Name = g.Name,
                     TargetAmount = g.TargetAmount,
                     CurrentAmount = g.CurrentAmount,
@@ -42,7 +42,7 @@ namespace GroupSavingsApi.Controllers
             return Ok(new SavingsGoalResponseDto
             {
                 Id = g.Id,
-                GroupId = g.GroupId,
+                GroupSessionId = g.GroupSessionId,
                 Name = g.Name,
                 TargetAmount = g.TargetAmount,
                 CurrentAmount = g.CurrentAmount,
@@ -56,7 +56,7 @@ namespace GroupSavingsApi.Controllers
             var goal = new SavingsGoal
             {
                 Id = Guid.NewGuid(),
-                GroupId = dto.GroupId,
+                GroupSessionId = dto.GroupSessionId,
                 Name = dto.Name,
                 TargetAmount = dto.TargetAmount,
                 CurrentAmount = 0,
@@ -67,7 +67,7 @@ namespace GroupSavingsApi.Controllers
             return CreatedAtAction(nameof(GetGoal), new { id = goal.Id }, new SavingsGoalResponseDto
             {
                 Id = goal.Id,
-                GroupId = goal.GroupId,
+                GroupSessionId = goal.GroupSessionId,
                 Name = goal.Name,
                 TargetAmount = goal.TargetAmount,
                 CurrentAmount = goal.CurrentAmount,

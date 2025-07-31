@@ -7,7 +7,8 @@ namespace GroupSavingsApi.Models
     {
         public Guid Id { get; set; }
         [Required]
-        public Guid GroupId { get; set; }
+        public Guid GroupSessionId { get; set; }
+        public GroupSession GroupSession { get; set; } = null!;
         [Required]
         public string Name { get; set; } = string.Empty;
         public decimal TargetAmount { get; set; }
