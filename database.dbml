@@ -115,7 +115,7 @@ Table savings_goals {
   target_amount   decimal(18,2) [not null]
   current_amount  decimal(18,2) [not null, default: 0]
   target_date     datetime   [not null]
-  is_deleted      boolean    [not null, default: false]
+  is_deleted      boolean    [not null, default: false] 
 }
 
 
