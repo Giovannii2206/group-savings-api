@@ -118,6 +118,7 @@ Table savings_goals {
   is_deleted      boolean    [not null, default: false]
 }
 
+
 // Reporting endpoints available:
 // - GET /api/ContributionReports/ByUser
 // - GET /api/ContributionReports/ByGroup
