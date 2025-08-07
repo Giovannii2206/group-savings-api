@@ -7,10 +7,26 @@ export default function Groups() {
   const [name, setName] = useState('');
   const [createdBy, setCreatedBy] = useState('');
 
-  const createGroup = async () => {
+  const [error, setError] = useState(null);
+const [loading, setLoading] = useState(false);
+
+const createGroup = async () => {
+  setError(null);
+  if (!name || !createdBy) {
+    setError('Group name and CreatedBy are required.');
+    return;
+  }
+  setLoading(true);
+  try {
     const res = await axios.post(`${API_BASE}/Group`, { name, createdBy });
     setGroups([...groups, res.data]);
-  };
+    setName(''); setCreatedBy('');
+  } catch (err) {
+    setError(err.response?.data?.message || err.message || 'Submission failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div>

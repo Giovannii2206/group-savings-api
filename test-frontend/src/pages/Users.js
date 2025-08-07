@@ -7,10 +7,26 @@ export default function Users() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const createUser = async () => {
+  const [error, setError] = useState(null);
+const [loading, setLoading] = useState(false);
+
+const createUser = async () => {
+  setError(null);
+  if (!email || !password) {
+    setError('Email and password are required.');
+    return;
+  }
+  setLoading(true);
+  try {
     const res = await axios.post(`${API_BASE}/User`, { email, password });
     setUsers([...users, res.data]);
-  };
+    setEmail(''); setPassword('');
+  } catch (err) {
+    setError(err.response?.data?.message || err.message || 'Submission failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div>

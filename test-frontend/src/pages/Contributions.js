@@ -10,12 +10,32 @@ export default function Contributions() {
   const [date, setDate] = useState('');
   const [type, setType] = useState('deposit');
 
-  const createContribution = async () => {
+  const [error, setError] = useState(null);
+const [loading, setLoading] = useState(false);
+
+const createContribution = async () => {
+  setError(null);
+  if (!groupSessionId || !userId || !amount || !date || !type) {
+    setError('All fields are required.');
+    return;
+  }
+  setLoading(true);
+  try {
     const res = await axios.post(`${API_BASE}/Contribution`, {
-      groupSessionId, userId, amount: Number(amount), date, type
+      groupSessionId,
+      userId,
+      amount: Number(amount),
+      date,
+      type
     });
     setContributions([...contributions, res.data]);
-  };
+    setGroupSessionId(''); setUserId(''); setAmount(''); setDate(''); setType('deposit');
+  } catch (err) {
+    setError(err.response?.data?.message || err.message || 'Submission failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div>

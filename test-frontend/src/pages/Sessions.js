@@ -11,12 +11,33 @@ export default function Sessions() {
   const [frequency, setFrequency] = useState('');
   const [status, setStatus] = useState('Active');
 
-  const createSession = async () => {
+  const [error, setError] = useState(null);
+const [loading, setLoading] = useState(false);
+
+const createSession = async () => {
+  setError(null);
+  if (!groupId || !targetAmount || !targetDate || !startDate || !frequency || !status) {
+    setError('All fields are required.');
+    return;
+  }
+  setLoading(true);
+  try {
     const res = await axios.post(`${API_BASE}/GroupSession`, {
-      groupId, targetAmount: Number(targetAmount), targetDate, startDate, frequency, status
+      groupId,
+      targetAmount: Number(targetAmount),
+      targetDate,
+      startDate,
+      frequency,
+      status
     });
     setSessions([...sessions, res.data]);
-  };
+    setGroupId(''); setTargetAmount(''); setTargetDate(''); setStartDate(''); setFrequency(''); setStatus('Active');
+  } catch (err) {
+    setError(err.response?.data?.message || err.message || 'Submission failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div>
