@@ -1,6 +1,7 @@
 using Xunit;
 using GroupSavingsApi.Controllers;
 using GroupSavingsApi.Models;
+using GroupSavingsApi.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GroupSavingsApi.Data;
@@ -25,18 +26,18 @@ namespace GroupSavingsApi.Tests
         {
             // Arrange
             var controller = GetControllerWithInMemoryDb();
-            var group = new Group { Name = "Test Group", Description = "Unit test group" };
+            var createDto = new CreateGroupDto { Name = "Test Group", CreatedBy = Guid.NewGuid(), Status = "Active" };
 
             // Act
-            var createResult = await controller.CreateGroup(group);
-            var created = (createResult as CreatedAtActionResult)?.Value as Group;
+            var createResult = await controller.CreateGroup(createDto);
+            var created = (createResult.Result as CreatedAtActionResult)?.Value as GroupResponseDto;
             var getResult = await controller.GetGroup(created.Id);
-            var fetched = (getResult as OkObjectResult)?.Value as Group;
+            var fetched = (getResult.Result as OkObjectResult)?.Value as GroupResponseDto;
 
             // Assert
             Assert.NotNull(created);
             Assert.NotNull(fetched);
-            Assert.Equal(group.Name, fetched.Name);
+            Assert.Equal(createDto.Name, fetched.Name);
         }
     }
 }

@@ -19,6 +19,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddHttpClient();
+builder.Services.AddHostedService<GroupSavingsApi.Services.NgrokManagerService>();
 
 var app = builder.Build();
 
