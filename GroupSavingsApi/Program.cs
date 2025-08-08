@@ -11,7 +11,17 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<GroupSavingsDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqliteOptions => 
+        {
+            sqliteOptions.CommandTimeout(60); // Increase command timeout
+            sqliteOptions.MigrationsAssembly(typeof(Program).Assembly.FullName);
+        });
+    options.EnableSensitiveDataLogging();
+    options.EnableDetailedErrors();
+});
 
 builder.Services.AddCors(options =>
 {
